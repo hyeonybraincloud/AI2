@@ -17,9 +17,9 @@ Dataset: https://www.kaggle.com/datasets/grassknoted/asl-alphabet/data
 ## 가. Fine_tuning_a_model_with_ASL_Dataset.ipynb
 ### 1) Flow
 **① 라이브러리 및 환경 설정**
-- torch, torchvision, matplotlib, PIL 등 필요한 패키지 import
+- `torch`, `torchvision`, `matplotlib`, `PIL` 등 필요한 패키지 `import`
 
-- CUDA 사용 가능 여부 체크
+- `CUDA` 사용 가능 여부 체크(A100)
 
 데이터셋 로딩 및 전처리
 
