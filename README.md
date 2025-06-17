@@ -13,7 +13,52 @@ Dataset: https://www.kaggle.com/datasets/grassknoted/asl-alphabet/data
 
 데이터셋은, A, B, C, ..., Z, nothing, del, space, 총 29 개의 클래스로 구성되며, 클래스마다 3,000 장의 이미지가 있다. 각 이미지는 영어 알파벳에 대응되는 수어를 나타낸다.
 
-# 2. Flow
+# 2. Configuration
 ## 가. Fine_tuning_a_model_with_ASL_Dataset.ipynb
+### 1) Flow
+**① 라이브러리 및 환경 설정**
+- torch, torchvision, matplotlib, PIL 등 필요한 패키지 import
+
+- CUDA 사용 가능 여부 체크
+
+데이터셋 로딩 및 전처리
+
+ASL 이미지 데이터셋 로딩 (경로: ./asl_dataset)
+
+transforms.Compose를 이용한 이미지 전처리 (리사이즈, 센터크롭, 텐서화 등)
+
+훈련 및 검증 데이터셋 생성 (ImageFolder 활용)
+
+DataLoader를 통해 배치 단위로 데이터 제공
+
+사전 학습된 모델 로딩 및 수정
+
+resnet18 모델 불러오기 (pretrained=True)
+
+마지막 fc layer를 ASL 클래스 수(29개)로 변경
+
+모델을 GPU로 전송
+
+손실 함수 및 최적화 도구 설정
+
+손실 함수: CrossEntropyLoss
+
+옵티마이저: SGD (with momentum)
+
+모델 학습
+
+에폭 단위 반복
+
+각 에폭마다 학습 및 검증 수행
+
+정확도와 손실 출력
+
+가장 좋은 모델을 저장 (best_model_wts)
+
+모델 저장
+
+학습 완료 후 최적의 모델을 파일로 저장 (asl_resnet18.pth)
+
 
 asl_model_local.pth
+## 나. realtime_demo.py
