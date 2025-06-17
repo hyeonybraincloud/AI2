@@ -21,13 +21,12 @@ Dataset: https://www.kaggle.com/datasets/grassknoted/asl-alphabet/data
 
 - `CUDA` 사용 가능 여부 체크(A100)
 
-데이터셋 로딩 및 전처리
+**② 데이터셋 로딩 및 전처리**
+- ASL 이미지 데이터셋 로딩 (경로: ./asl_dataset)
 
-ASL 이미지 데이터셋 로딩 (경로: ./asl_dataset)
+- transforms.Compose를 이용한 이미지 전처리 (리사이즈, 센터크롭, 텐서화 등)
 
-transforms.Compose를 이용한 이미지 전처리 (리사이즈, 센터크롭, 텐서화 등)
-
-훈련 및 검증 데이터셋 생성 (ImageFolder 활용)
+**③ 훈련 및 검증 데이터셋 생성 (ImageFolder 활용)**
 
 DataLoader를 통해 배치 단위로 데이터 제공
 
