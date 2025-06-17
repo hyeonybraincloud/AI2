@@ -14,4 +14,6 @@ Dataset: https://www.kaggle.com/datasets/grassknoted/asl-alphabet/data
 데이터셋은, A, B, C, ..., Z, nothing, del, space, 총 29 개의 클래스로 구성되며, 클래스마다 3,000 장의 이미지가 있다. 각 이미지는 영어 알파벳에 대응되는 수어를 나타낸다.
 
 # 2. Flow
-## 가. 파일의 역할 구분
+## 가. Fine_tuning_a_model_with_ASL_Dataset.ipynb
+
+asl_model_local.pth
