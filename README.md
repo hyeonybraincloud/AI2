@@ -44,21 +44,26 @@ Dataset: https://www.kaggle.com/datasets/grassknoted/asl-alphabet/data
 증강 전에 랜드마크 오버레이가 되었다고 가정하겠다. 증강 단계에서 밝기·대비·채도 등이 무작위로 변경되면, 미리 그려둔 랜드마크의 색상 등이 예측 불가능하게 변형되어 모델이 일관된 시각적 패턴을 학습하기 어려워진다. 그래서 일관된 시각적 신호르 제공하기 위해, **원본 → 증강 → 오버레이** 순서로 했다.
 
 **⑥ PyTorch 데이터셋 및 데이터로더 구성**  
-- `DST_ROOT`의 오버레이된 이미지를 `ImageFolder`로 불러와 전체 데이터셋 생성  
-- 80:20 비율로 훈련/검증 세트 분할  
+- `DST_ROOT`의 오버레이된 이미지를 `ImageFolder`로 불러와 전체 데이터셋 생성
+
+- 80:20 비율로 훈련/검증 세트 분할
+
 - `Resize → ToTensor → Normalize` 변환 적용
+
 - `DataLoader`를 통해 배치 처리, 셔플, 멀티프로세스 로딩 설정
 
-7. **모델 준비 및 학습 설정**  
-   - 사전학습된 MobileNetV2 불러와 최종 분류기 레이어를 29개 클래스로 교체  
-   - 손실 함수(`CrossEntropyLoss`), 옵티마이저(`AdamW`), 학습률 스케줄러, AMP용 `GradScaler` 설정
+**⑦ 모델 준비 및 학습 설정**  
+- 사전학습된 `MobileNetV2`을 불러와 최종 분류기 레이어를 29개 클래스로 교체  
 
-8. **훈련·검증 루프 → 모델 저장**  
-   - 에포크마다  
-     - **훈련 모드**: forward → backward → optimizer/스케일러 업데이트  
-     - **검증 모드**: no_grad 상태에서 손실·정확도 평가  
-     - 손실, 정확도, 소요 시간 출력  
-   - 학습 종료 후 `.pth` 가중치를 Drive 경로에 저장
+- 손실 함수(`CrossEntropyLoss`), 옵티마이저(`AdamW`), 학습률 스케줄러, AMP용 `GradScaler` 설정
+
+**⑧ 훈련·검증 루프 → 모델 저장**  
+- 에포크마다  
+      - **훈련 모드**: forward → backward → optimizer/스케일러 업데이트  
+      - **검증 모드**: no_grad 상태에서 손실·정확도 평가  
+      - 손실, 정확도, 소요 시간 출력  
+
+- 학습 종료 후 `.pth` 가중치를 Drive 경로에 저장
 
 
 학습 완료 후 최적의 모델을 파일로 저장 (asl_resnet18.pth)
