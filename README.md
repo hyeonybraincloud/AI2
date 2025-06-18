@@ -14,7 +14,7 @@ Dataset: https://www.kaggle.com/datasets/grassknoted/asl-alphabet/data
 데이터셋은, A, B, C, ..., Z, nothing, del, space, 총 29 개의 클래스로 구성되며, 클래스마다 3,000 장의 이미지가 있다. 각 이미지는 영어 알파벳에 대응되는 수어를 나타낸다.
 
 # 2. Configuration
-## 가. Fine_tuning_a_model_with_ASL_Dataset.ipynb
+## 가. Fine_tuning_a_model_with_ASL_Dataset.py
 ### 1) Flow
 **① 구글 드라이브 마운트 및 데이터 압축 해제**  
 - Colab에서 Drive를 연결하고, `asl_alphabet_train` 폴더를 `/tmp`로 압축 해제(빠른 처리를 위해 로컬로 옮기는 것임)
@@ -66,11 +66,55 @@ Dataset: https://www.kaggle.com/datasets/grassknoted/asl-alphabet/data
 
 - 학습 종료 후 `asl_model_local.pth`를 Drive에 저장
 
+## 나. realtime_demo.py
+### 1) Flow
+**① 라이브러리 임포트 및 옵션 파싱**  
+- OpenCV, PyTorch, torchvision transforms, Mediapipe, PIL 등 필요한 모듈 불러오기  
+
+- `--model` 인자로 학습된 `.pth` 파일 경로 입력 받기
+
+**② 모델 로드 및 전처리 설정**  
+- 지정된 경로에서 `torch.load`로 가중치 불러와 `model.load_state_dict()`  
+
+- `model.eval()`로 평가 모드 전환  
+
+- 입력 영상용 전처리 파이프라인(`Resize → ToTensor → Normalize`) 정의
+
+**③ Mediapipe Hands 초기화**  
+- `mp.solutions.hands.Hands` 객체 생성 (정적 이미지 모드 비활성화하여 실시간 처리)  
+
+- 관절점·연결선을 그릴 `mp.solutions.drawing_utils` 준비
+
+**④ 웹캠 스트림 열기**  
+- `cv2.VideoCapture(0)`으로 기본 카메라 연결  
+
+- 프레임 너비·높이 가져오기
+
+**⑤ 프레임별 처리 루프**  
+- **프레임 읽기**: `cap.read()` 로 BGR 이미지 획득  
+
+- **색상 변환**: BGR → RGB  
+
+- **손 검출**: `hands.process()` 로 랜드마크 위치 추출  
+
+- **ROI(손 영역) 추출**: 랜드마크 좌표로 최소 경계 박스 계산, 해당 영역을 `224×224` 크기로 리사이즈  
+
+- **모델 추론**: PIL 이미지로 변환 후 전처리 적용, 배치 차원 추가하여 모델에 입력 → 예측 결과(`argmax`) 추출, 최근 N프레임 예측을 다수결로 안정화  
+
+**⑥ 결과 시각화**  
+- 원본 프레임에 Mediapipe 관절점·연결선 오버레이  
+
+- 예측된 알파벳 라벨을 `cv2.putText` 로 출력  
+
+- `cv2.imshow` 로 실시간 창에 렌더링
+
+**⑦ 종료 조건 처리**  
+- 키 입력(`ESC`)을 감지하면 루프 탈출
+
+**⑧ 자원 해제**  
+- `cap.release()` 및 `cv2.destroyAllWindows()` 로 카메라·윈도우 자원 정리
+
+### 2) Execution
 ![N_asl](https://github.com/user-attachments/assets/1d5753e7-576b-4b40-b542-c1c58b78b24c)
 ![D_asl](https://github.com/user-attachments/assets/a922c6c5-6a75-47c8-bac9-ef9346a13bbe)
 ![A_asl](https://github.com/user-attachments/assets/b961f4a2-c6ed-4043-b78f-3790594ab68f)
-
-
-
-asl_model_local.pth
-## 나. realtime_demo.py
