@@ -58,12 +58,11 @@ Dataset: https://www.kaggle.com/datasets/grassknoted/asl-alphabet/data
 - 손실 함수(`CrossEntropyLoss`), 옵티마이저(`AdamW`), 학습률 스케줄러, AMP용 `GradScaler` 설정
 
 **⑧ 훈련·검증 루프 → 모델 저장**  
-- 에포크마다  
-      - **훈련 모드**: forward → backward → optimizer/스케일러 업데이트
+- **훈련 모드**: forward → backward → optimizer/스케일러 업데이트
+
+- **검증 모드**: no_grad 상태에서 손실·정확도 평가
   
-      - **검증 모드**: no_grad 상태에서 손실·정확도 평가
-  
-      - 손실, 정확도, 소요 시간 출력  
+- 손실, 정확도, 소요 시간 출력  
 
 - 학습 종료 후 `asl_model_local.pth`를 Drive에 저장
 
