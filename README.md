@@ -59,14 +59,14 @@ Dataset: https://www.kaggle.com/datasets/grassknoted/asl-alphabet/data
 
 **⑧ 훈련·검증 루프 → 모델 저장**  
 - 에포크마다  
-      - **훈련 모드**: forward → backward → optimizer/스케일러 업데이트  
-      - **검증 모드**: no_grad 상태에서 손실·정확도 평가  
+      - **훈련 모드**: forward → backward → optimizer/스케일러 업데이트
+  
+      - **검증 모드**: no_grad 상태에서 손실·정확도 평가
+  
       - 손실, 정확도, 소요 시간 출력  
 
-- 학습 종료 후 `.pth` 가중치를 Drive 경로에 저장
+- 학습 종료 후 `asl_model_local.pth`를 Drive에 저장
 
-
-학습 완료 후 최적의 모델을 파일로 저장 (asl_resnet18.pth)
 ![N_asl](https://github.com/user-attachments/assets/1d5753e7-576b-4b40-b542-c1c58b78b24c)
 ![D_asl](https://github.com/user-attachments/assets/a922c6c5-6a75-47c8-bac9-ef9346a13bbe)
 ![A_asl](https://github.com/user-attachments/assets/b961f4a2-c6ed-4043-b78f-3790594ab68f)
