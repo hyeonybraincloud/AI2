@@ -16,45 +16,49 @@ Dataset: https://www.kaggle.com/datasets/grassknoted/asl-alphabet/data
 # 2. Configuration
 ## 가. Fine_tuning_a_model_with_ASL_Dataset.ipynb
 ### 1) Flow
-**① 라이브러리 및 환경 설정**
-- `torch`, `torchvision`, `matplotlib`, `PIL` 등 필요한 패키지 `import`
+**① 구글 드라이브 마운트 및 데이터 압축 해제**  
+- Colab에서 Drive를 연결하고, `asl_alphabet_train` 폴더를 `/tmp`로 압축 해제(빠른 처리를 위해 로컬로 옮기는 것임)
 
-- `CUDA` 사용 가능 여부 체크(A100)
+**② 작업 디렉터리 및 하이퍼파라미터 설정**  
+- 원본 데이터 경로(`SRC_ROOT`), 증강 결과 경로(`AUG_ROOT`), 오버레이 결과 경로(`DST_ROOT`) 지정
 
-**② 데이터셋 로딩 및 전처리**
-- ASL 이미지 데이터셋 로딩 (경로: ./asl_dataset)
+- 증강본 개수(`NUM_AUG`), 배치 크기, 학습률, 에포크 수 등 선언
 
-- transforms.Compose를 이용한 이미지 전처리 (리사이즈, 센터크롭, 텐서화 등)
+**③ 증강 파이프라인 정의**  
+- `RandomHorizontalFlip`(좌우 반전), `RandomRotation`(±15° 회전), `ColorJitter`(색상 변경) 등을 묶어 `aug_transform` 생성
 
-**③ 훈련 및 검증 데이터셋 생성 (ImageFolder 활용)**
+**④ 데이터 폴더 구조 준비**  
+- 클래스별 하위 폴더를 `AUG_ROOT`와 `DST_ROOT`에 미리 생성
 
-DataLoader를 통해 배치 단위로 데이터 제공
+**⑤ 데이터 증강 → 랜드마크 오버레이 → 저장**  
+- 각 클래스 폴더 내 원본 이미지 순회  
+   
+- 원본 이미지에 대해 `NUM_AUG`개의 증강본 생성  
 
-사전 학습된 모델 로딩 및 수정
+- 증강본마다 Mediapipe Hands로 손 랜드마크 검출  
 
-resnet18 모델 불러오기 (pretrained=True)
+- 검출된 경우 관절점·연결선 오버레이 후 `DST_ROOT`에 저장
 
-마지막 fc layer를 ASL 클래스 수(29개)로 변경
+**※ 왜 증강 후에 랜드마크 오버레이를 하였는가?**
+증강 전에 랜드마크 오버레이가 되었다고 가정하겠다. 증강 단계에서 밝기·대비·채도 등이 무작위로 변경되면, 미리 그려둔 랜드마크의 색상 등이 예측 불가능하게 변형되어 모델이 일관된 시각적 패턴을 학습하기 어려워진다. 그래서 일관된 시각적 신호르 제공하기 위해, **원본 → 증강 → 오버레이** 순서로 했다.
 
-모델을 GPU로 전송
+6. **PyTorch 데이터셋 및 데이터로더 구성**  
+   - `DST_ROOT`의 오버레이된 이미지를 `ImageFolder`로 불러와 전체 데이터셋 생성  
+   - 80:20 비율로 훈련/검증 세트 분할  
+   - `Resize → ToTensor → Normalize` 변환 적용  
+   - `DataLoader`를 통해 배치 처리, 셔플, 멀티프로세스 로딩 설정
 
-손실 함수 및 최적화 도구 설정
+7. **모델 준비 및 학습 설정**  
+   - 사전학습된 MobileNetV2 불러와 최종 분류기 레이어를 29개 클래스로 교체  
+   - 손실 함수(`CrossEntropyLoss`), 옵티마이저(`AdamW`), 학습률 스케줄러, AMP용 `GradScaler` 설정
 
-손실 함수: CrossEntropyLoss
+8. **훈련·검증 루프 → 모델 저장**  
+   - 에포크마다  
+     - **훈련 모드**: forward → backward → optimizer/스케일러 업데이트  
+     - **검증 모드**: no_grad 상태에서 손실·정확도 평가  
+     - 손실, 정확도, 소요 시간 출력  
+   - 학습 종료 후 `.pth` 가중치를 Drive 경로에 저장
 
-옵티마이저: SGD (with momentum)
-
-모델 학습
-
-에폭 단위 반복
-
-각 에폭마다 학습 및 검증 수행
-
-정확도와 손실 출력
-
-가장 좋은 모델을 저장 (best_model_wts)
-
-모델 저장
 
 학습 완료 후 최적의 모델을 파일로 저장 (asl_resnet18.pth)
 ![N_asl](https://github.com/user-attachments/assets/1d5753e7-576b-4b40-b542-c1c58b78b24c)
