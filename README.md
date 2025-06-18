@@ -57,6 +57,10 @@ resnet18 모델 불러오기 (pretrained=True)
 모델 저장
 
 학습 완료 후 최적의 모델을 파일로 저장 (asl_resnet18.pth)
+![N_asl](https://github.com/user-attachments/assets/1d5753e7-576b-4b40-b542-c1c58b78b24c)
+![D_asl](https://github.com/user-attachments/assets/a922c6c5-6a75-47c8-bac9-ef9346a13bbe)
+![A_asl](https://github.com/user-attachments/assets/b961f4a2-c6ed-4043-b78f-3790594ab68f)
+
 
 
 asl_model_local.pth
